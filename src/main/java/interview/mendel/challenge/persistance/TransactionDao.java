@@ -1,26 +1,28 @@
-package interview.mendel.challenge.interfaces;
+package interview.mendel.challenge.persistance;
 
 import interview.mendel.challenge.models.Transaction;
+import org.springframework.data.jpa.repository.JpaRepository;
+import org.springframework.stereotype.Repository;
 
 import java.util.List;
 import java.util.Optional;
-import java.util.stream.Stream;
 
-public interface TransactionDao {
+@Repository
+public interface TransactionDao extends JpaRepository<Transaction, Long> {
 
     /**
      * Get a transaction by its id
      * @param id
      * @return The corresponding transaction to that id
      */
-    Optional<Transaction> getTransactionById(Long id);
+    Optional<Transaction> findById(Long id);
 
     /**
      * Get a list of transactions by type
      * @param type: Type of the transaction
      * @return
      */
-    Stream<Transaction> getTransactionsByType(String type);
+    List<Transaction> findByType(String type);
 
     /**
      * Get a list of transitively connected transactions by the given id
@@ -28,7 +30,7 @@ public interface TransactionDao {
      * @return The list of transactions that are transitively connected to the target transaction,
      *         including the transaction itself.
      */
-    Stream<Transaction> getChildRelatedTransactions(Long id);
+    //tream<Transaction> getChildRelatedTransactions(Long id);
 
     /**
      * Update a transaction with new information
@@ -36,6 +38,6 @@ public interface TransactionDao {
      * @param oldTxInfo: The old information to be updated
      * @return The updated transaction
      */
-    Optional<Transaction> updateTransaction(Transaction newTxInfo, Transaction oldTxInfo);
+    //Optional<Transaction> updateTransaction(Transaction newTxInfo, Transaction oldTxInfo);
 
 }

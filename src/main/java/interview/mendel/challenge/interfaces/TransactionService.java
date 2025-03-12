@@ -26,7 +26,7 @@ public interface TransactionService {
      * @param id: the id of the target transaction
      * @return The sum of the
      */
-    Double getSumOfTransactions(Long id);
+    //Double getSumOfTransactions(Long id);
 
     /**
      * Update a transaction by its id
@@ -34,5 +34,5 @@ public interface TransactionService {
      * @param id: the id of the target transaction
      * @return
      */
-    Optional<Transaction> updateTransaction(Transaction tx, Long id);
+    //Optional<Transaction> updateTransaction(Transaction tx, Long id);
 }

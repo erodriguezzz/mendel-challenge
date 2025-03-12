@@ -1,19 +1,28 @@
 package interview.mendel.challenge.models;
 
+import jakarta.persistence.*;
+
+import java.util.List;
 import java.util.Objects;
 
+@Entity
+@Table(name = "transactions")
 public class Transaction {
 
+    @Id
+    @GeneratedValue(strategy = GenerationType.AUTO)
     private Long id;
     private String type;
     private Double amount;
     private Long parent_id;
 
+    @OneToMany(mappedBy = "parent_id", fetch = FetchType.LAZY)
+    private List<Transaction> children;
+
     public Transaction() {
     }
 
-    public Transaction(Long id, String type, Double amount, Long parent_id) {
-        this.id = id;
+    public Transaction(String type, Double amount, Long parent_id) {
         this.type = type;
         this.amount = amount;
         this.parent_id = parent_id;
@@ -49,6 +58,14 @@ public class Transaction {
 
     public void setParent_id(Long parent_id) {
         this.parent_id = parent_id;
+    }
+
+    public List<Transaction> getChildren() {
+        return children;
+    }
+
+    public void setChildren(List<Transaction> children) {
+        this.children = children;
     }
 
     @Override

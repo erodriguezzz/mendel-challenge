@@ -38,18 +38,18 @@ public class TransactionController {
         return transactionService.getTransactionsByType(type);
     }
 
-    @GetMapping("/sum/{id}")
-    public Map<String, Double> getSumOfTransactions(@PathVariable Long id) {
-        return Map.of("sum", transactionService.getSumOfTransactions(id));
-    }
+    //@GetMapping("/sum/{id}")
+    //public Map<String, Double> getSumOfTransactions(@PathVariable Long id) {
+    //    return Map.of("sum", transactionService.getSumOfTransactions(id));
+    //}
 
-    @PutMapping("/{id}")
-    public Transaction updateTransaction(@RequestBody Transaction tx, @PathVariable Long id) {
-        Optional<Transaction> updatedTx = transactionService.updateTransaction(tx, id);
-        if (updatedTx.isEmpty()) {
-            throw new TransactionNotFoundException();
-        }
-        return updatedTx.get();
-    }
+    //@PutMapping("/{id}")
+    //public Transaction updateTransaction(@RequestBody Transaction tx, @PathVariable Long id) {
+    //    Optional<Transaction> updatedTx = transactionService.updateTransaction(tx, id);
+    //    if (updatedTx.isEmpty()) {
+    //        throw new TransactionNotFoundException();
+    //    }
+    //    return updatedTx.get();
+    //}
 
 }
