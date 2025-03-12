@@ -3,8 +3,10 @@ package interview.mendel.challenge.controllers;
 import interview.mendel.challenge.exceptions.TransactionNotFoundException;
 import interview.mendel.challenge.models.Transaction;
 import interview.mendel.challenge.interfaces.TransactionService;
+import interview.mendel.challenge.models.TransactionDto;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
@@ -25,12 +27,14 @@ public class TransactionController {
     }
 
     @GetMapping("/{id}")
-    public Transaction getTransactionById(@PathVariable Long id) {
+    public ResponseEntity<TransactionDto> getTransactionById(@PathVariable Long id) {
         Optional<Transaction> tx = transactionService.getTransactionById(id);
         if (tx.isEmpty()) {
-            throw new TransactionNotFoundException();
+            throw new TransactionNotFoundException(id.toString());
         }
-        return tx.get();
+        Transaction t = tx.get();
+        List<Long> children = t.getChildren().stream().map(Transaction::getId).toList();
+        return ResponseEntity.ok(new TransactionDto(t.getType(), t.getAmount(), t.getParent(), children));
     }
 
     @GetMapping("/type/{type}")
@@ -38,18 +42,18 @@ public class TransactionController {
         return transactionService.getTransactionsByType(type);
     }
 
-    //@GetMapping("/sum/{id}")
-    //public Map<String, Double> getSumOfTransactions(@PathVariable Long id) {
-    //    return Map.of("sum", transactionService.getSumOfTransactions(id));
-    //}
+    @GetMapping("/sum/{id}")
+    public Map<String, Double> getSumOfTransactions(@PathVariable Long id) {
+        return Map.of("sum", transactionService.getSumOfTransactions(id));
+    }
 
-    //@PutMapping("/{id}")
-    //public Transaction updateTransaction(@RequestBody Transaction tx, @PathVariable Long id) {
-    //    Optional<Transaction> updatedTx = transactionService.updateTransaction(tx, id);
-    //    if (updatedTx.isEmpty()) {
-    //        throw new TransactionNotFoundException();
-    //    }
-    //    return updatedTx.get();
-    //}
+    @PutMapping("/{id}")
+    public ResponseEntity<TransactionDto> updateTransaction(@RequestBody TransactionDto tx, @PathVariable Long id) {
+        Optional<Transaction> updatedTx = transactionService.updateTransaction(tx, id);
+        if (updatedTx.isEmpty()) {
+            throw new TransactionNotFoundException(id.toString());
+        }
+        return ResponseEntity.noContent().build();
+    }
 
 }

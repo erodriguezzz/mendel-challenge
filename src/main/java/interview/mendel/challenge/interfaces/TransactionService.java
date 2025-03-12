@@ -1,6 +1,7 @@
 package interview.mendel.challenge.interfaces;
 
 import interview.mendel.challenge.models.Transaction;
+import interview.mendel.challenge.models.TransactionDto;
 
 import java.util.List;
 import java.util.Optional;
@@ -26,7 +27,7 @@ public interface TransactionService {
      * @param id: the id of the target transaction
      * @return The sum of the
      */
-    //Double getSumOfTransactions(Long id);
+    Double getSumOfTransactions(Long id);
 
     /**
      * Update a transaction by its id
@@ -34,5 +35,5 @@ public interface TransactionService {
      * @param id: the id of the target transaction
      * @return
      */
-    //Optional<Transaction> updateTransaction(Transaction tx, Long id);
+    Optional<Transaction> updateTransaction(TransactionDto tx, Long id);
 }

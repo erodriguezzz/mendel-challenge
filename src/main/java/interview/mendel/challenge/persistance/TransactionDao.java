@@ -1,6 +1,7 @@
 package interview.mendel.challenge.persistance;
 
 import interview.mendel.challenge.models.Transaction;
+import org.springframework.data.jpa.repository.EntityGraph;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.stereotype.Repository;
 
@@ -30,14 +31,7 @@ public interface TransactionDao extends JpaRepository<Transaction, Long> {
      * @return The list of transactions that are transitively connected to the target transaction,
      *         including the transaction itself.
      */
-    //tream<Transaction> getChildRelatedTransactions(Long id);
-
-    /**
-     * Update a transaction with new information
-     * @param newTxInfo: The new information to be updated
-     * @param oldTxInfo: The old information to be updated
-     * @return The updated transaction
-     */
-    //Optional<Transaction> updateTransaction(Transaction newTxInfo, Transaction oldTxInfo);
+    @EntityGraph(attributePaths = {"children"})
+    Optional<Transaction> findWithChildrenById(Long id);
 
 }
