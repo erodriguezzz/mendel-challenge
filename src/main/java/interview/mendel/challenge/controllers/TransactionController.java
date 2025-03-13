@@ -6,9 +6,11 @@ import interview.mendel.challenge.interfaces.TransactionService;
 import interview.mendel.challenge.models.TransactionDto;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.data.domain.Pageable;
+import org.springframework.web.server.ResponseStatusException;
 
 import java.util.List;
 import java.util.Map;
@@ -41,16 +43,25 @@ public class TransactionController {
     public List<Long> getTransactionsWithType(@PathVariable String type,
                                               @RequestParam(defaultValue = "0") int page,
                                               @RequestParam(defaultValue = "10") int size) {
+        if(type == null || type.isEmpty()){
+            throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "\"type\" cannot be empty");
+        }
         return transactionService.getTransactionsByType(type, Pageable.ofSize(size).withPage(page));
     }
 
     @GetMapping("/sum/{id}")
     public Map<String, Double> getSumOfTransactions(@PathVariable Long id) {
+        if(id == null || id < 0){
+            throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "\"id\" cannot be empty");
+        }
         return Map.of("sum", transactionService.getSumOfTransactions(id));
     }
 
     @PutMapping("/{id}")
     public ResponseEntity<TransactionDto> updateTransaction(@RequestBody TransactionDto tx, @PathVariable Long id) {
+        if(id == null || id < 0){
+            throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "\"id\" cannot be empty");
+        }
         Optional<Transaction> updatedTx = transactionService.updateTransaction(tx, id);
         if (updatedTx.isEmpty()) {
             throw new TransactionNotFoundException(id.toString());
