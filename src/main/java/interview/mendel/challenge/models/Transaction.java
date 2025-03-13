@@ -1,22 +1,33 @@
 package interview.mendel.challenge.models;
 
+import jakarta.persistence.*;
+
+import java.util.ArrayList;
+import java.util.List;
 import java.util.Objects;
 
+@Entity
+@Table(name = "transactions")
 public class Transaction {
 
+    @Id
+    @GeneratedValue(strategy = GenerationType.AUTO)
     private Long id;
     private String type;
     private Double amount;
-    private Long parent_id;
+
+    @ManyToOne
+    private Transaction parent;
+
+    @OneToMany(mappedBy = "parent", fetch = FetchType.LAZY, cascade = CascadeType.ALL, orphanRemoval = true)
+    private List<Transaction> children = new ArrayList<>();
 
     public Transaction() {
     }
 
-    public Transaction(Long id, String type, Double amount, Long parent_id) {
-        this.id = id;
+    public Transaction(String type, Double amount) {
         this.type = type;
         this.amount = amount;
-        this.parent_id = parent_id;
     }
 
     public Long getId() {
@@ -43,12 +54,33 @@ public class Transaction {
         this.amount = amount;
     }
 
-    public Long getParent_id() {
-        return parent_id;
+    public List<Transaction> getChildren() {
+        return children;
     }
 
-    public void setParent_id(Long parent_id) {
-        this.parent_id = parent_id;
+    public void setChildren(List<Transaction> children) {
+        this.children = children;
+    }
+
+    public Transaction getParent() {
+        return parent;
+    }
+
+    public void setParent(Transaction parent) {
+        this.parent = parent;
+    }
+
+    public void addChild(Transaction child) {
+        if (this.children == null) {
+            this.children = new ArrayList<>();
+        }
+        this.children.add(child);
+    }
+
+    public void removeChild(Transaction child) {
+        if (this.children != null) {
+            this.children.remove(child);
+        }
     }
 
     @Override
@@ -57,13 +89,12 @@ public class Transaction {
         if (!(o instanceof Transaction that)) return false;
         return Objects.equals(id, that.id) &&
                 Objects.equals(type, that.type) &&
-                Objects.equals(amount, that.amount) &&
-                Objects.equals(parent_id, that.parent_id);
+                Objects.equals(amount, that.amount);
     }
 
     @Override
     public int hashCode() {
-        return Objects.hash(id, type, amount, parent_id);
+        return Objects.hash(id, type, amount);
     }
 
     @Override
@@ -72,7 +103,6 @@ public class Transaction {
                 "id=" + id +
                 ", type='" + type + '\'' +
                 ", amount=" + amount +
-                ", parentId=" + parent_id +
                 '}';
     }
 }

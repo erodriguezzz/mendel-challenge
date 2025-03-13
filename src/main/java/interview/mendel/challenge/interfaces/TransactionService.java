@@ -1,6 +1,8 @@
 package interview.mendel.challenge.interfaces;
 
 import interview.mendel.challenge.models.Transaction;
+import interview.mendel.challenge.models.TransactionDto;
+import org.springframework.data.domain.Pageable;
 
 import java.util.List;
 import java.util.Optional;
@@ -16,10 +18,11 @@ public interface TransactionService {
 
     /**
      * Get a list of transactions by type
-     * @param type
+     * @param type The type of the transaction
+     * @param pageable The pagination object
      * @return
      */
-    List<Long> getTransactionsByType(String type);
+    List<Long> getTransactionsByType(String type, Pageable pageable);
 
     /**
      * Get the sum of transactions by id
@@ -34,5 +37,5 @@ public interface TransactionService {
      * @param id: the id of the target transaction
      * @return
      */
-    Optional<Transaction> updateTransaction(Transaction tx, Long id);
+    Optional<Transaction> updateTransaction(TransactionDto tx, Long id);
 }
