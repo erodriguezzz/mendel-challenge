@@ -1,41 +1,26 @@
 package interview.mendel.challenge.models;
 
-import jakarta.persistence.*;
-
-import java.util.ArrayList;
-import java.util.List;
-import java.util.Objects;
-
-@Entity
-@Table(name = "transactions")
 public class Transaction {
 
-    @Id
-    @GeneratedValue(strategy = GenerationType.AUTO)
     private Long id;
     private String type;
     private Double amount;
+    private Long parentId;
 
-    @ManyToOne
-    private Transaction parent;
-
-    @OneToMany(mappedBy = "parent", fetch = FetchType.LAZY, cascade = CascadeType.ALL, orphanRemoval = true)
-    private List<Transaction> children = new ArrayList<>();
-
-    public Transaction() {
-    }
-
-    public Transaction(String type, Double amount) {
+    public Transaction(Long id, String type, Double amount) {
+        this.id = id;
         this.type = type;
         this.amount = amount;
     }
 
-    public Long getId() {
-        return id;
+    public static Transaction fromTransactionDto(TransactionDto tx, Long id) {
+        Transaction transaction = new Transaction(id, tx.getType(), tx.getAmount());
+        transaction.setParentId(tx.getParent_id());
+        return transaction;
     }
 
-    public void setId(Long id) {
-        this.id = id;
+    public Long getId() {
+        return id;
     }
 
     public String getType() {
@@ -54,55 +39,11 @@ public class Transaction {
         this.amount = amount;
     }
 
-    public List<Transaction> getChildren() {
-        return children;
+    public Long getParent_id() {
+        return parentId;
     }
 
-    public void setChildren(List<Transaction> children) {
-        this.children = children;
-    }
-
-    public Transaction getParent() {
-        return parent;
-    }
-
-    public void setParent(Transaction parent) {
-        this.parent = parent;
-    }
-
-    public void addChild(Transaction child) {
-        if (this.children == null) {
-            this.children = new ArrayList<>();
-        }
-        this.children.add(child);
-    }
-
-    public void removeChild(Transaction child) {
-        if (this.children != null) {
-            this.children.remove(child);
-        }
-    }
-
-    @Override
-    public boolean equals(Object o) {
-        if (this == o) return true;
-        if (!(o instanceof Transaction that)) return false;
-        return Objects.equals(id, that.id) &&
-                Objects.equals(type, that.type) &&
-                Objects.equals(amount, that.amount);
-    }
-
-    @Override
-    public int hashCode() {
-        return Objects.hash(id, type, amount);
-    }
-
-    @Override
-    public String toString() {
-        return "Transaction{" +
-                "id=" + id +
-                ", type='" + type + '\'' +
-                ", amount=" + amount +
-                '}';
+    public void setParentId(Long parentId) {
+        this.parentId = parentId;
     }
 }

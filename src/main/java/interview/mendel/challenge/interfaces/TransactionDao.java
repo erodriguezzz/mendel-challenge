@@ -1,16 +1,12 @@
-package interview.mendel.challenge.persistance;
+package interview.mendel.challenge.interfaces;
 
 import interview.mendel.challenge.models.Transaction;
-import org.springframework.data.domain.Pageable;
-import org.springframework.data.jpa.repository.EntityGraph;
-import org.springframework.data.jpa.repository.JpaRepository;
-import org.springframework.stereotype.Repository;
+import interview.mendel.challenge.models.TransactionDto;
 
 import java.util.List;
 import java.util.Optional;
 
-@Repository
-public interface TransactionDao extends JpaRepository<Transaction, Long> {
+public interface TransactionDao {
 
     /**
      * Get a transaction by its id
@@ -24,7 +20,7 @@ public interface TransactionDao extends JpaRepository<Transaction, Long> {
      * @param type: Type of the transaction
      * @return
      */
-    List<Transaction> findByType(String type, Pageable pageable);
+    List<Transaction> findByType(String type);
 
     /**
      * Get a list of transitively connected transactions by the given id
@@ -32,7 +28,20 @@ public interface TransactionDao extends JpaRepository<Transaction, Long> {
      * @return The list of transactions that are transitively connected to the target transaction,
      *         including the transaction itself.
      */
-    @EntityGraph(attributePaths = {"children"})
-    Optional<Transaction> findWithChildrenById(Long id);
+    Optional<Double> findTransitiveTransactionSum(Long id);
 
+    /**
+     * Update a transaction by its id
+     * @param tx: the updated body of the transaction
+     * @param id: the id of the target transaction
+     * @return
+     */
+    Optional<Transaction> updateTransaction(Transaction tx, Long id);
+
+    /**
+     * Create a transaction
+     * @param tx: the body of the new transaction
+     * @return
+     */
+    Optional<Transaction> createTransaction(TransactionDto tx, Long id);
 }
