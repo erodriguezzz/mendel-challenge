@@ -1,6 +1,7 @@
 package interview.mendel.challenge.persistance;
 
 import interview.mendel.challenge.models.Transaction;
+import org.springframework.data.domain.Pageable;
 import org.springframework.data.jpa.repository.EntityGraph;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.stereotype.Repository;
@@ -23,7 +24,7 @@ public interface TransactionDao extends JpaRepository<Transaction, Long> {
      * @param type: Type of the transaction
      * @return
      */
-    List<Transaction> findByType(String type);
+    List<Transaction> findByType(String type, Pageable pageable);
 
     /**
      * Get a list of transitively connected transactions by the given id

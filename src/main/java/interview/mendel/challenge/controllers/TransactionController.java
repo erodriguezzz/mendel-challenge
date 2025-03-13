@@ -8,6 +8,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
+import org.springframework.data.domain.Pageable;
 
 import java.util.List;
 import java.util.Map;
@@ -33,13 +34,14 @@ public class TransactionController {
             throw new TransactionNotFoundException(id.toString());
         }
         Transaction t = tx.get();
-        List<Long> children = t.getChildren().stream().map(Transaction::getId).toList();
-        return ResponseEntity.ok(new TransactionDto(t.getType(), t.getAmount(), t.getParent(), children));
+        return ResponseEntity.ok(new TransactionDto(t.getType(), t.getAmount(), t.getParent()));
     }
 
     @GetMapping("/type/{type}")
-    public List<Long> getTransactionsWithType(@PathVariable String type) {
-        return transactionService.getTransactionsByType(type);
+    public List<Long> getTransactionsWithType(@PathVariable String type,
+                                              @RequestParam(defaultValue = "0") int page,
+                                              @RequestParam(defaultValue = "10") int size) {
+        return transactionService.getTransactionsByType(type, Pageable.ofSize(size).withPage(page));
     }
 
     @GetMapping("/sum/{id}")

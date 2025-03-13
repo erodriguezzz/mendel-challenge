@@ -7,6 +7,7 @@ import interview.mendel.challenge.interfaces.TransactionService;
 import interview.mendel.challenge.models.Transaction;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 
 import java.util.HashSet;
@@ -32,18 +33,15 @@ public class TransactionServiceImpl implements TransactionService {
     }
 
     @Override
-    public List<Long> getTransactionsByType(String type) {
-        return transactionRepository.findByType(type).stream().map(Transaction::getId).toList();
+    public List<Long> getTransactionsByType(String type, Pageable pageable) {
+        return transactionRepository.findByType(type, pageable).stream().map(Transaction::getId).toList();
     }
 
     @Override
     public Double getSumOfTransactions(Long id) {
-        Optional<Transaction> txOpt = transactionRepository.findWithChildrenById(id);
+        Transaction txOpt = transactionRepository.findWithChildrenById(id).orElseThrow(() -> new ParentTransactionNotFoundException(id.toString()));
         Set<Long> visited = new HashSet<>();
-        if (txOpt.isEmpty()) {
-            return 0.0;
-        }
-        return sumTransactionsRecursively(txOpt.get(), visited);
+        return sumTransactionsRecursively(txOpt, visited);
     }
 
     private double sumTransactionsRecursively(Transaction transaction, Set<Long> visited) {
@@ -67,18 +65,16 @@ public class TransactionServiceImpl implements TransactionService {
         if (oldTx.isEmpty()) {
             return Optional.empty();
         }
-        Transaction oldParent = oldTx.get().getParent();
-        Optional<Transaction> parent = transactionRepository.findById(newTx.getParent_id());
-        if (parent.isEmpty()) {
-            throw new ParentTransactionNotFoundException(newTx.getParent_id().toString());
-        }
-        if(oldParent != null){
-            oldParent.removeChild(oldTx.get());
+        Transaction parent = null;
+        if (newTx.getParent_id() != null){
+            parent = transactionRepository.findById(newTx.getParent_id()).orElseThrow(() -> new ParentTransactionNotFoundException(newTx.getParent_id().toString()));
         }
         oldTx.get().setAmount(newTx.getAmount());
         oldTx.get().setType(newTx.getType());
-        oldTx.get().setParent(parent.get());
-        parent.get().addChild(oldTx.get());
+        oldTx.get().setParent(parent);
+        if(parent != null){
+            parent.addChild(oldTx.get());
+        }
         transactionRepository.save(oldTx.get());
         return oldTx;
     }

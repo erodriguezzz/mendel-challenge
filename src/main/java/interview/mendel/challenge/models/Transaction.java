@@ -2,6 +2,7 @@ package interview.mendel.challenge.models;
 
 import jakarta.persistence.*;
 
+import java.util.ArrayList;
 import java.util.List;
 import java.util.Objects;
 
@@ -18,8 +19,8 @@ public class Transaction {
     @ManyToOne
     private Transaction parent;
 
-    @OneToMany(mappedBy = "parent", fetch = FetchType.LAZY)
-    private List<Transaction> children;
+    @OneToMany(mappedBy = "parent", fetch = FetchType.LAZY, cascade = CascadeType.ALL, orphanRemoval = true)
+    private List<Transaction> children = new ArrayList<>();
 
     public Transaction() {
     }
@@ -70,11 +71,16 @@ public class Transaction {
     }
 
     public void addChild(Transaction child) {
+        if (this.children == null) {
+            this.children = new ArrayList<>();
+        }
         this.children.add(child);
     }
 
     public void removeChild(Transaction child) {
-        this.children.remove(child);
+        if (this.children != null) {
+            this.children.remove(child);
+        }
     }
 
     @Override
