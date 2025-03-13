@@ -2,7 +2,6 @@ package interview.mendel.challenge.controllers;
 
 import interview.mendel.challenge.models.Transaction;
 import interview.mendel.challenge.interfaces.TransactionService;
-import interview.mendel.challenge.models.TransactionDto;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.mockito.MockitoAnnotations;
