@@ -2,13 +2,13 @@ package interview.mendel.challenge.controllers;
 
 import interview.mendel.challenge.models.Transaction;
 import interview.mendel.challenge.interfaces.TransactionService;
-import interview.mendel.challenge.models.TransactionDto;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
-import org.mockito.InjectMocks;
-import org.mockito.Mock;
 import org.mockito.MockitoAnnotations;
-import org.springframework.http.MediaType;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.boot.test.context.SpringBootTest;
+import org.springframework.boot.test.mock.mockito.MockBean;
+import org.springframework.test.context.ActiveProfiles;
 import org.springframework.test.web.servlet.MockMvc;
 import org.springframework.test.web.servlet.setup.MockMvcBuilders;
 
@@ -20,14 +20,16 @@ import static org.mockito.Mockito.*;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.*;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.*;
 
+@SpringBootTest
+@ActiveProfiles("test")
 class TransactionControllerTest {
 
     private MockMvc mockMvc;
 
-    @Mock
+    @MockBean
     private TransactionService transactionService;
 
-    @InjectMocks
+    @Autowired
     private TransactionController transactionController;
 
     private List<Transaction> txs = new ArrayList<>();
@@ -38,30 +40,25 @@ class TransactionControllerTest {
         mockMvc = MockMvcBuilders.standaloneSetup(transactionController).build();
 
         txs.addAll(List.of(
-                new Transaction("deposit", 100.0),
-                new Transaction("withdrawal", 50.0),
-                new Transaction("deposit", 30.0)
+                new Transaction(1L,"deposit", 100.0),
+                new Transaction(2L,"withdrawal", 50.0),
+                new Transaction(3L,"deposit", 30.0)
         ));
 
-        txs.get(0).setId(1L);
-        txs.get(1).setId(2L);
-        txs.get(2).setId(3L);
 
-        txs.get(1).setParent(txs.get(0));
-        txs.get(2).setParent(txs.get(0));
-
-        txs.get(0).setChildren(List.of(txs.get(1), txs.get(2)));
+        txs.get(1).setParentId(0L);
+        txs.get(2).setParentId(0L);
 
     }
 
     @Test
     void testGetTransactionById_Success() throws Exception {
-        when(transactionService.getTransactionById(1L)).thenReturn(Optional.of(txs.getFirst()));
+        when(transactionService.getTransactionById(1L)).thenReturn(Optional.of(txs.get(0)));
 
         mockMvc.perform(get("/transactions/1"))
                 .andExpect(status().isOk())
-                .andExpect(jsonPath("$.type").value(txs.getFirst().getType()))
-                .andExpect(jsonPath("$.amount").value(txs.getFirst().getAmount()));
+                .andExpect(jsonPath("$.type").value(txs.get(0).getType()))
+                .andExpect(jsonPath("$.amount").value(txs.get(0).getAmount()));
 
         verify(transactionService, times(1)).getTransactionById(1L);
     }
@@ -78,7 +75,7 @@ class TransactionControllerTest {
 
     @Test
     void testSumOfTransactions_Success() throws Exception {
-        when(transactionService.getSumOfTransactions(1L)).thenReturn(txs.stream().map(Transaction::getAmount).reduce(Double::sum).orElse(0.0));
+        when(transactionService.getSumOfTransactions(1L)).thenReturn(Optional.of(txs.get(0).getAmount() + txs.get(1).getAmount() + txs.get(2).getAmount()));
 
         mockMvc.perform(get("/transactions/sum/1"))
                 .andExpect(status().isOk())
@@ -86,7 +83,6 @@ class TransactionControllerTest {
 
         verify(transactionService, times(1)).getSumOfTransactions(1L);
     }
-
 
 
 }

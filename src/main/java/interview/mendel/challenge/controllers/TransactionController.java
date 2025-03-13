@@ -9,11 +9,9 @@ import org.slf4j.LoggerFactory;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
-import org.springframework.data.domain.Pageable;
 import org.springframework.web.server.ResponseStatusException;
 
 import java.util.List;
-import java.util.Map;
 import java.util.Optional;
 
 @RestController
@@ -31,34 +29,35 @@ public class TransactionController {
 
     @GetMapping("/{id}")
     public ResponseEntity<TransactionDto> getTransactionById(@PathVariable Long id) {
-        Optional<Transaction> tx = transactionService.getTransactionById(id);
-        if (tx.isEmpty()) {
-            throw new TransactionNotFoundException(id.toString());
-        }
-        Transaction t = tx.get();
-        return ResponseEntity.ok(new TransactionDto(t.getType(), t.getAmount(), t.getParent()));
-    }
-
-    @GetMapping("/type/{type}")
-    public List<Long> getTransactionsWithType(@PathVariable String type,
-                                              @RequestParam(defaultValue = "0") int page,
-                                              @RequestParam(defaultValue = "10") int size) {
-        if(type == null || type.isEmpty()){
-            throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "\"type\" cannot be empty");
-        }
-        return transactionService.getTransactionsByType(type, Pageable.ofSize(size).withPage(page));
-    }
-
-    @GetMapping("/sum/{id}")
-    public Map<String, Double> getSumOfTransactions(@PathVariable Long id) {
         if(id == null || id < 0){
             throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "\"id\" cannot be empty");
         }
-        return Map.of("sum", transactionService.getSumOfTransactions(id));
+        Optional<Transaction> tx = transactionService.getTransactionById(id);
+        if(tx.isEmpty()){
+            throw new ResponseStatusException(HttpStatus.NOT_FOUND, "Transaction not found");
+        }
+        return ResponseEntity.ok(TransactionDto.fromTransaction(tx.get()));
+    }
+
+    @GetMapping("/type/{type}")
+    public ResponseEntity<List<Long>> getTransactionsWithType(@PathVariable String type) {
+        if(type == null || type.isEmpty()){
+            throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "\"type\" cannot be empty");
+        }
+        return ResponseEntity.ok(transactionService.getTransactionsByType(type));
+    }
+
+    @GetMapping("/sum/{id}")
+    public ResponseEntity<?> getSumOfTransactions(@PathVariable Long id) {
+        if(id == null || id < 0){
+            throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "\"id\" cannot be empty");
+        }
+        Double sum = transactionService.getSumOfTransactions(id).orElseThrow(() -> new TransactionNotFoundException(id.toString()));
+        return ResponseEntity.ok("{\"sum\":" + sum + "}");
     }
 
     @PutMapping("/{id}")
-    public ResponseEntity<TransactionDto> updateTransaction(@RequestBody TransactionDto tx, @PathVariable Long id) {
+    public ResponseEntity<?> updateTransaction(@RequestBody TransactionDto tx, @PathVariable Long id) {
         if(id == null || id < 0){
             throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "\"id\" cannot be empty");
         }
@@ -66,7 +65,7 @@ public class TransactionController {
         if (updatedTx.isEmpty()) {
             throw new TransactionNotFoundException(id.toString());
         }
-        return ResponseEntity.noContent().build();
+        return ResponseEntity.ok("{\"status\": \"ok\"}");
     }
 
 }
