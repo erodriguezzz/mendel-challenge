@@ -2,6 +2,7 @@ package interview.mendel.challenge.controllers;
 
 import interview.mendel.challenge.models.Transaction;
 import interview.mendel.challenge.interfaces.TransactionService;
+import interview.mendel.challenge.models.TransactionDto;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.mockito.MockitoAnnotations;
@@ -39,15 +40,16 @@ class TransactionControllerTest {
         MockitoAnnotations.openMocks(this);
         mockMvc = MockMvcBuilders.standaloneSetup(transactionController).build();
 
+        txs.clear();
+
         txs.addAll(List.of(
                 new Transaction(1L,"deposit", 100.0),
                 new Transaction(2L,"withdrawal", 50.0),
                 new Transaction(3L,"deposit", 30.0)
         ));
 
-
-        txs.get(1).setParentId(0L);
-        txs.get(2).setParentId(0L);
+        txs.get(1).setParentId(1L);
+        txs.get(2).setParentId(1L);
 
     }
 
@@ -71,6 +73,36 @@ class TransactionControllerTest {
                 .andExpect(status().isNotFound());
 
         verify(transactionService, times(1)).getTransactionById(1L);
+    }
+
+    @Test
+    void testGetTransactionByInvalidId_BadRequest() throws Exception {
+        mockMvc.perform(get("/transactions/-1"))
+                .andExpect(status().isBadRequest());
+        verify(transactionService, times(0)).getTransactionById(-1L);
+    }
+
+    @Test
+    void testGetTransactionsWithType_Success() throws Exception {
+        when(transactionService.getTransactionsByType("deposit")).thenReturn(txs.stream().filter(tx -> tx.getType().equals("deposit")).map(Transaction::getId).toList());
+
+        mockMvc.perform(get("/transactions/type/deposit"))
+                .andExpect(status().isOk())
+                .andExpect(jsonPath("$[0]").value(1L))
+                .andExpect(jsonPath("$[1]").value(3L));
+
+        verify(transactionService, times(1)).getTransactionsByType("deposit");
+    }
+
+    @Test
+    void testGetTransactionsWithType_NotFound() throws Exception {
+        when(transactionService.getTransactionsByType("deposit")).thenReturn(List.of());
+
+        mockMvc.perform(get("/transactions/type/deposit"))
+                .andExpect(status().isOk())
+                .andExpect(content().json("[]"));
+
+        verify(transactionService, times(1)).getTransactionsByType("deposit");
     }
 
     @Test

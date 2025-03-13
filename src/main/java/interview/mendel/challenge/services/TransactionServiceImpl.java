@@ -1,7 +1,6 @@
 package interview.mendel.challenge.services;
 
 import interview.mendel.challenge.models.TransactionDto;
-import interview.mendel.challenge.exceptions.ParentTransactionNotFoundException;
 import interview.mendel.challenge.interfaces.TransactionService;
 import interview.mendel.challenge.models.Transaction;
 import interview.mendel.challenge.persistance.TransactionRepository;
