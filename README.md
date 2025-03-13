@@ -4,13 +4,8 @@ Esta solución al desafío de Mendel se basa en una API "REST" que permite reali
 
 ## Ejecución
 Para ejecutar el proyecto se deben seguir los siguientes pasos:
-1. Empaquetar el proyecto maven para poder buildear la imagen de docker. Para esto se debe correr el siguiente comando desde la raíz del proyecto:
 
-```bash
-mvn clean package
-```
-
-2. Correr el siguiente comandos desde la raíz del proyecto:
+1. Correr el siguiente comandos desde la raíz del proyecto:
 
 ```bash
 make build run
