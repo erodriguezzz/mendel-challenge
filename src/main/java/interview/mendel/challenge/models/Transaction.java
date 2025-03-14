@@ -46,4 +46,32 @@ public class Transaction {
     public void setParentId(Long parentId) {
         this.parentId = parentId;
     }
+
+    @Override
+    public boolean equals(Object obj) {
+        if (this == obj) {
+            return true;
+        }
+        if (obj == null || getClass() != obj.getClass()) {
+            return false;
+        }
+        Transaction transaction = (Transaction) obj;
+        return id.equals(transaction.id);
+    }
+
+    @Override
+    public int hashCode() {
+        return id.hashCode();
+    }
+
+    @Override
+    public String toString() {
+        return "Transaction{" +
+                "id=" + id +
+                ", type='" + type + '\'' +
+                ", amount=" + amount +
+                ", parentId=" + parentId +
+                '}';
+    }
+
 }

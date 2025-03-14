@@ -1,5 +1,6 @@
 package interview.mendel.challenge.services;
 
+import interview.mendel.challenge.exceptions.ParentTransactionNotFoundException;
 import interview.mendel.challenge.models.TransactionDto;
 import interview.mendel.challenge.interfaces.TransactionService;
 import interview.mendel.challenge.models.Transaction;
@@ -42,7 +43,18 @@ public class TransactionServiceImpl implements TransactionService {
 
     @Override
     public Optional<Transaction> updateTransaction(TransactionDto newTx, Long id) {
-        return transactionRepository.updateTransaction(Transaction.fromTransactionDto(newTx, id), id);
+
+        Transaction parent = null;
+        if (newTx.getParent_id() != null){
+            parent = transactionRepository.findById(newTx.getParent_id()).orElseThrow(() -> new ParentTransactionNotFoundException(newTx.getParent_id().toString()));
+        }
+        Optional<Transaction> oldTx = transactionRepository.findById(id);
+        if (oldTx.isEmpty()) {
+            return transactionRepository.saveTransaction(Transaction.fromTransactionDto(newTx, id), id);
+        }
+        oldTx.get().setParentId(parent == null ? null : parent.getId());
+
+        return transactionRepository.saveTransaction(oldTx.get(), id);
     }
 
 }

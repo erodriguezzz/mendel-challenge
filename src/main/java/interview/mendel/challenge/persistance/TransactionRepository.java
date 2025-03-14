@@ -61,25 +61,8 @@ public class TransactionRepository implements TransactionDao {
     }
 
     @Override
-    public Optional<Transaction> updateTransaction(Transaction newTx, Long id) {
-        Transaction parent = null;
-        if (newTx.getParent_id() != null){
-            parent = findById(newTx.getParent_id()).orElseThrow(() -> new ParentTransactionNotFoundException(newTx.getParent_id().toString()));
-        }
-        Optional<Transaction> oldTx = findById(id);
-        if (oldTx.isEmpty()) {
-            return createTransaction(TransactionDto.fromTransaction(newTx), id);
-        }
-        oldTx.get().setAmount(newTx.getAmount());
-        oldTx.get().setType(newTx.getType());
-        oldTx.get().setParentId(parent == null ? null : parent.getId());
-
-        return Optional.of(oldTx.get());
-    }
-
-    @Override
-    public Optional<Transaction> createTransaction(TransactionDto tx, Long id) {
-        txs.put(id, Transaction.fromTransactionDto(tx, id));
+    public Optional<Transaction> saveTransaction(Transaction tx, Long id) {
+        txs.put(id, tx);
         return Optional.of(txs.get(id));
     }
 }

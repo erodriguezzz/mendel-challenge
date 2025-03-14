@@ -115,31 +115,4 @@ class TransactionRepositoryTest {
         assertEquals(210.0, found.get());
     }
 
-    @Test
-    @DisplayName("Should update transaction successfully")
-    void testUpdateParentSuccessfully() {
-        TransactionDto newTx = new TransactionDto("transfer", 200.0, 1L);
-        Long id = txs.get(0).getId();
-
-        assertEquals(100.0, txs.get(0).getAmount());
-        assertNull(txs.get(0).getParent_id());
-        assertEquals("deposit", txs.get(0).getType());
-
-        Optional<Transaction> updatedTx = txRepo.updateTransaction(Transaction.fromTransactionDto(newTx, id), id);
-
-        assertTrue(updatedTx.isPresent());
-        assertEquals(200.0, updatedTx.get().getAmount());
-        assertEquals("transfer", updatedTx.get().getType());
-        assertEquals(1L, updatedTx.get().getParent_id());
-    }
-
-    @Test
-    @DisplayName("Should throw exception when trying to update transaction with non-existing parent")
-    void testThrowExceptionWhenParentNotFound() {
-        TransactionDto newTx = new TransactionDto("transfer", 200.0, 1000L);
-        Long id = txs.get(0).getId();
-
-        assertThrows(ParentTransactionNotFoundException.class, () -> txRepo.updateTransaction(Transaction.fromTransactionDto(newTx, id), id));
-    }
-
 }

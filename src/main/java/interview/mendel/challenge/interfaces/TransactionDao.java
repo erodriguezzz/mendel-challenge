@@ -31,17 +31,9 @@ public interface TransactionDao {
     Optional<Double> findTransitiveTransactionSum(Long id);
 
     /**
-     * Update a transaction by its id
-     * @param tx: the updated body of the transaction
-     * @param id: the id of the target transaction
-     * @return
-     */
-    Optional<Transaction> updateTransaction(Transaction tx, Long id);
-
-    /**
      * Create a transaction
      * @param tx: the body of the new transaction
      * @return
      */
-    Optional<Transaction> createTransaction(TransactionDto tx, Long id);
+    Optional<Transaction> saveTransaction(Transaction tx, Long id);
 }
