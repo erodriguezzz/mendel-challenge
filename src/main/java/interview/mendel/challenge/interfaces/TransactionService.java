@@ -18,14 +18,14 @@ public interface TransactionService {
     /**
      * Get a list of transactions by type
      * @param type The type of the transaction
-     * @return
+     * @return A list of transactions with the given type
      */
     List<Long> getTransactionsByType(String type);
 
     /**
      * Get the sum of transactions by id
      * @param id: the id of the target transaction
-     * @return The sum of the
+     * @return The sum of all amounts from transitively connected transactions to the one with the given id
      */
     Optional<Double> getSumOfTransactions(Long id);
 
@@ -33,7 +33,7 @@ public interface TransactionService {
      * Update a transaction by its id
      * @param tx: the updated body of the transaction
      * @param id: the id of the target transaction
-     * @return
+     * @return The updated/created transaction
      */
     Optional<Transaction> updateTransaction(TransactionDto tx, Long id);
 }

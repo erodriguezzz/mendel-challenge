@@ -18,22 +18,21 @@ public interface TransactionDao {
     /**
      * Get a list of transactions by type
      * @param type: Type of the transaction
-     * @return
+     * @return A list of transactions with the given type
      */
     List<Transaction> findByType(String type);
 
     /**
      * Get a list of transitively connected transactions by the given id
      * @param id: the id of the target transaction. This is the ancestor of all other transactions to be returned
-     * @return The list of transactions that are transitively connected to the target transaction,
-     *         including the transaction itself.
+     * @return The sum of all amounts from transitively connected transactions to the one with the given id
      */
     Optional<Double> findTransitiveTransactionSum(Long id);
 
     /**
      * Create a transaction
      * @param tx: the body of the new transaction
-     * @return
+     * @return The saved transaction
      */
     Optional<Transaction> saveTransaction(Transaction tx, Long id);
 }
